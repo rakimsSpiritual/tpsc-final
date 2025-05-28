@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Host or Join in meeting</title>
+    <title>Join classroom</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="./../../materialize.min.css">
     <link rel="stylesheet" href="./../../stylee.css">
@@ -116,11 +116,11 @@
                     window.location.replace(meetingUrl);
                 });
 
-                $(document).on("click", ".host-meeting", function (e) {
-                    let eight_d_number = Math.floor(Math.random() * 100000000);
-                    var meetingUrl = window.location.origin + "?meetingID=" + eight_d_number;
-                    window.location.replace(meetingUrl);
-                });
+                // $(document).on("click", ".host-meeting", function (e) {
+                //     let eight_d_number = Math.floor(Math.random() * 100000000);
+                //     var meetingUrl = window.location.origin + "?meetingID=" + eight_d_number;
+                //     window.location.replace(meetingUrl);
+                // });
 
                 return;
             } else {
