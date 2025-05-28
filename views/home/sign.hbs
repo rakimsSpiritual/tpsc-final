@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Join classroom</title>
+    <title>Join Classroom</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="./../../materialize.min.css">
     <link rel="stylesheet" href="./../../stylee.css">
@@ -11,7 +11,7 @@
         body {
             margin: 0;
             font-family: 'Segoe UI', sans-serif;
-/*             background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Flag_of_Tanzania.svg/1920px-Flag_of_Tanzania.svg.png'); */
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Flag_of_Tanzania.svg/1920px-Flag_of_Tanzania.svg.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -60,7 +60,7 @@
 
 <body>
     <div class="header-bar">
-        <div style="font-weight:bold;">TPSC Video Conference</div>
+        <div style="font-weight:bold;">TPSC Video Classroom Session</div>
         <div class="info-group">
             <div id="clock"></div>
             <div id="day"></div>
@@ -72,8 +72,7 @@
     <div class="main-wrap">
         <div class="call-wrap card" style="z-index: 99">
             <div class="action-wrap" style="display: flex;justify-content: center; align-items: center;padding:30px;">
-<!--                 <div style="display:flex; justify-content:center;align-items:center;background-color:#00554d;height:50px;max-width:200px;min-width:200px;font-size:20px;align-self:center;color:white;margin-right:50px;border-radius:5px;cursor:pointer;" class="host-meeting">Host</div> -->
-                <div style="display:flex; justify-content:center;align-items:center;background-color:#00554d;height:50px;max-width:200px;min-width:200px;font-size:20px;align-self:center;color:white;border-radius:5px;cursor:pointer;" class="join-meeting">Join</div>
+                <div style="display:flex; justify-content:center;align-items:center;background-color:#00554d;height:50px;max-width:200px;min-width:200px;font-size:20px;align-self:center;color:white;border-radius:5px;cursor:pointer;" class="join-meeting">Join Classroom</div>
             </div>
         </div>
     </div>
@@ -129,7 +128,7 @@
 
             var user_id = urlParams.get('uid');
             if (!user_id) {
-                user_id = window.prompt('Enter your nick name!');
+                user_id = window.prompt('Enter your nickname!');
             }
 
             if (!user_id || !meeting_id) {
