@@ -3,305 +3,31 @@
 
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>TeLIS Video Classroom</title>
+    <title>TeLis Video Classromm</title>
     <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
     <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="./../../bootstrap.min.css">
     <link rel="stylesheet" href="./../../style.css">
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
     <script src="./../../jquery-3.4.1.min.js"></script>
+    <!-- <script src="scripts/jquery.signalR-2.2.2.min.js"></script> -->
+    <!-- <script src="https://localhost:44338/signalr/hubs"></script> -->
+    <!--    <script src="wrtchelper.js"></script>-->
     <script src="./../../app.js"></script>
-    <style>
-        :root {
-            --primary-color: #2c5f2d;
-            --secondary-color: #97bc62;
-            --accent-color: #f5f5f5;
-            --text-dark: #333;
-            --text-light: #fff;
-            --highlight-color: #ff6b6b;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
-            overflow: hidden;
-        }
-        
-        .home-wrap {
-            height: 100vh;
-            background-color: var(--accent-color);
-        }
-        
-        .g-top {
-            flex: 1;
-            background-color: var(--primary-color);
-            position: relative;
-            border-radius: 0 0 20px 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
-        
-        .top-remote-video-show-wrap {
-            height: 100%;
-            position: relative;
-        }
-        
-        .call-wrap {
-            height: 100%;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
-        }
-        
-        .video-wrap {
-            height: 100%;
-            padding: 15px;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .userbox {
-            margin: 10px;
-            background-color: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            padding: 10px;
-            transition: all 0.3s ease;
-            min-width: 200px;
-            flex: 1 1 300px;
-            max-width: 400px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .userbox:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-        }
-        
-        .userbox video {
-            width: 100%;
-            border-radius: 10px;
-            background-color: #000;
-        }
-        
-        .g-top-left {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            border-radius: 10px;
-            padding: 5px 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            z-index: 2;
-        }
-        
-        .g-bottom {
-            height: 80px;
-            padding: 0 20px;
-            border-radius: 20px 20px 0 0;
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            color: white;
-        }
-        
-        .bottom-middle {
-            gap: 15px;
-        }
-        
-        .action-icon-style {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-        
-        .action-icon-style:hover {
-            background-color: rgba(255, 255, 255, 0.3);
-            transform: scale(1.05);
-        }
-        
-        .end-call-wrap {
-            background-color: var(--highlight-color) !important;
-        }
-        
-        .end-call-wrap:hover {
-            background-color: #ff5252 !important;
-        }
-        
-        .present-now-wrap {
-            padding: 10px 15px;
-            border-radius: 30px;
-            transition: all 0.3s ease;
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        
-        .present-now-wrap:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-        }
-        
-        .option-wrap {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            transition: all 0.3s ease;
-        }
-        
-        .option-wrap:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-        }
-        
-        .g-right-details-wrap {
-            border-radius: 20px 0 0 20px;
-            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .meeting-heading-wrap {
-            border-radius: 20px 0 0 0;
-        }
-        
-        .people-chat-wrap {
-            border-radius: 0;
-        }
-        
-        .chat-message-sent-input-field {
-            background-color: transparent;
-            color: var(--text-dark);
-            padding: 10px;
-            border-radius: 20px;
-            transition: all 0.3s ease;
-        }
-        
-        .chat-message-sent-input-field:focus {
-            outline: none;
-            border-bottom: 2px solid var(--primary-color) !important;
-        }
-        
-        .chat-message-sent-action {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: var(--primary-color);
-            color: white !important;
-            transition: all 0.3s ease;
-        }
-        
-        .chat-message-sent-action:hover {
-            background-color: var(--secondary-color);
-            transform: rotate(30deg);
-        }
-        
-        .g-detail {
-            position: absolute;
-            bottom: 80px;
-            left: 20px;
-            background-color: white;
-            border-radius: 15px;
-            padding: 15px;
-            width: 300px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            z-index: 10;
-        }
-        
-        .meeting-details-button {
-            padding: 10px 15px;
-            border-radius: 30px;
-            background-color: rgba(255, 255, 255, 0.2);
-            color: white;
-            transition: all 0.3s ease;
-        }
-        
-        .meeting-details-button:hover {
-            background-color: rgba(255, 255, 255, 0.3);
-        }
-        
-        .top-box-show {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 100;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .top-box {
-            background-color: white;
-            padding: 20px;
-            border-radius: 15px;
-            max-width: 400px;
-            text-align: center;
-            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2);
-        }
-        
-        .call-leave-action {
-            background-color: var(--highlight-color);
-            border: none;
-            padding: 10px 25px;
-            border-radius: 30px;
-            font-weight: bold;
-        }
-        
-        .call-cancel-action {
-            background-color: #6c757d;
-            border: none;
-            padding: 10px 25px;
-            border-radius: 30px;
-            font-weight: bold;
-        }
-        
-        .recording-wrap {
-            position: absolute;
-            bottom: 70px;
-            right: 0;
-            background-color: white;
-            padding: 15px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .btn-sm {
-            border-radius: 20px;
-            font-weight: bold;
-        }
-        
-        #meetingname {
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: white;
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 1.2rem;
-            z-index: 2;
-        }
-        
-        .participant-count {
-            color: var(--primary-color);
-            font-weight: bold;
-        }
-        
-        .material-icons {
-            vertical-align: middle;
-        }
-    </style>
+
     <script>
         $(function() {
             const urlParams = new URLSearchParams(window.location.search);
             var meeting_id = urlParams.get('meetingID');
+
             var user_id = urlParams.get('uid');
             if (!user_id) {
                 user_id = window.prompt('Enter your nick name!');
             }
 
             if (!user_id || !meeting_id) {
-                alert('user id or meeting id missing');
                 window.location.href = '/sign';
                 return;
             }
@@ -316,7 +42,7 @@
 <body>
     <div id="meetingbox" style="display: none;">
         <p>It seems you are not trying to join any meeting!
-            You may start a new meeting. Here is generated ID for you. <a id='meetingid' href="#"></a>
+            You may start a new meeting. Here is generated for you. <a id='meetingid' href="#"></a>
         </p>
     </div>
 
@@ -325,7 +51,7 @@
             <div class="top-remote-video-show-wrap d-flex">
                 <div id="meetingContainer" style="display: none;flex-basis: 75%;">
                     <h1 id='meetingname'></h1>
-                    <div class="call-wrap" style="background-color: black;">
+                    <div class="call-wrap " style="background-color: black;">
                         <div id='divUsers' class="video-wrap" style="display:none;display: flex;flex-wrap: wrap;">
                             <div id="me" class="userbox div-center-column">
                                 <h2 class="display-center" style="font-size: 14px;"></h2>
@@ -345,21 +71,29 @@
                 </div>
                 <div class="g-right-details-wrap bg-light text-secondary h-100" style="flex-basis: 25%;z-index: 1;display: none;">
                     <div class="meeting-heading-wrap d-flex justify-content-between align-items-center pr-3 pl-3" style="height: 10vh;">
-                        <div class="meeting-heading font-weight-bold cursor-pointer">Meeting Details</div>
+                        <div class="meeting-heading font-weight-bold cursor-pointer"> Meeting Details</div>
                         <div class="meeting-heading-cross display-center cursor-pointer">
-                            <span class="material-icons">clear</span>
+                            <span class="material-icons">
+                                clear
+                            </span>
                         </div>
                     </div>
                     <div class="people-chat-wrap d-flex justify-content-between align-items-center border-bottom ml-3 mr-3 pl-3 pr-3" style="height: 10vh;font-size: 14px;">
                         <div class="people-heading display-center cursor-pointer">
                             <div class="people-heading-icon display-center mr-1">
-                                <span class="material-icons">people</span>
+                                <span class="material-icons">
+                                    people
+                                </span>
                             </div>
-                            <div class="people-heading-text display-center">Participant (<span class="participant-count">1</span>)</div>
+                            <div class="people-heading-text display-center ">Participant (<span class="participant-count">1</span>)</div>
                         </div>
                         <div class="chat-heading d-flex justify-content-around align-items-center cursor-pointer">
-                            <div class="chat-heading-icon display-center mr-1"><span class="material-icons">message</span></div>
-                            <div class="chat-heading-text">Chat</div>
+                            <div class="chat-heading-icon display-center mr-1"><span class="material-icons">
+                                    message
+                                </span></div>
+                            <div class="chat-heading-text">
+                                Chat
+                            </div>
                         </div>
                     </div>
                     <div class="in-call-chat-wrap mr-3 ml-3 mt-4" style="font-size: 14px;">
@@ -373,22 +107,30 @@
                                 </div>
                                 <div class="participant-action-wrap display-center">
                                     <div class="participant-action-dot display-center mr-2 cursor-pointer">
-                                        <span class="material-icons">more_vert</span>
+                                        <span class="material-icons">
+                                            more_vert
+                                        </span>
                                     </div>
                                     <div class="participant-action-pin display-center cursor-pointer">
-                                        <span class="material-icons">push_pin</span>
+                                        <span class="material-icons">
+                                            push_pin
+                                        </span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="chat-show-wrap text-secondary" style="font-size:14px;">
-                            <div class="chat-message-show" id="messages"></div>
+                            <div class="chat-message-show" id="messages">
+
+                            </div>
                             <div class="chat-message-sent d-flex justify-content-between align-items-center" style="margin-bottom: 35px;">
                                 <div class="chat-message-sent-input" style="width: 85%;">
                                     <input type="text" name="" class="chat-message-sent-input-field w-100" id="msgbox" placeholder="Send a message to everyone" style="border: navajowhite;border-bottom: 1px solid teal;">
                                 </div>
                                 <div class="chat-message-sent-action display-center" id="btnsend" style="color: teal;cursor: pointer;">
-                                    <span class="material-icons">send</span>
+                                    <span class="material-icons">
+                                        send
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -398,11 +140,15 @@
 
             <div class="g-top-left bg-light text-secondary w-25 d-flex align-items-center justify-content-between pl-2 pr-2">
                 <div class="top-left-participant-wrap pt-2 cursor-pointer">
-                    <div class="top-left-participant-icon"><span class="material-icons">people</span></div>
+                    <div class="top-left-participant-icon"><span class="material-icons">
+                            people
+                        </span></div>
                     <div class="top-left-participant-count"></div>
                 </div>
                 <div class="top-left-chat-wrap pt-2 cursor-pointer">
-                    <span class="material-icons">message</span>
+                    <span class="material-icons">
+                        message
+                    </span>
                 </div>
                 <div class="top-left-time-wrap"></div>
                 <div class="top-left-you-wrap text-light d-none">You</div>
@@ -410,65 +156,77 @@
         </div>
 
         <div class="g-bottom bg-light m-0 d-flex justify-content-between align-items-center">
-            <div class="bottom-left d-flex" style="height:10vh;">
-                <div class="g-detail border border-success mb-2" style="display: none;">
-                    <div class="g-details-heading d-flex justify-content-between align-items-center border-bottom">
-                        <div class="g-details-heading-attachment d-flex align-items-center cursor-pointer">
-                            <span><span class="material-icons">attachment</span></span><span style="margin-top: -5px;">attachment</span>
-                        </div>
-                    </div>
-                    <div class="g-details-heading-show-wrap">
-                        <div class="g-details-heading-show-attachment" style="display: none;position:relative; font-size: 14px;">
-                            <div class="show-attach-file"></div>
-                            <div class="upload-attach-file">
-                                <form enctype="multipart/form-data" ref='uploadForm' id='uploadForm' class="display-center" style="justify-content: space-between;">
-                                    <div class="custom-file" style="flex-basis:79%;">
-                                        <input type="file" class="custom-file-input" id="customFile" name="imagefile">
-                                        <label class="custom-file-label" for="customFile">Choose file</label>
-                                    </div>
-                                    <div class="share-button-wrap">
-                                        <button class="btn btn-primary btn-sm share-attach" style="flex-basis:19%;padding: 6px 20px;">Share</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
+            <!-- Left Section - Meeting Details -->
+            <div class="bottom-left d-flex align-items-center" style="height:10vh;">
+                <div class="display-center cursor-pointer meeting-details-button">
+                    <span class="material-icons mr-1">info</span>
+                    Meeting Details
                 </div>
-                <div class="display-center cursor-pointer meeting-details-button">Share File!<span class="material-icons">keyboard_arrow_down</span></div>
             </div>
 
-            <div class="bottom-middle d-flex justify-content-center align-items-center" style="height:10vh;">
-                <div class="mic-toggle-wrap action-icon-style display-center mr-2 cursor-pointer" id="btnMuteUnmute">
+            <!-- Center Section - Main Controls -->
+            <div class="d-flex justify-content-center align-items-center" style="height:10vh;">
+                <!-- Mic Control -->
+                <div class="action-icon-style display-center mx-2 cursor-pointer" id="btnMuteUnmute">
                     <span class="material-icons">mic_off</span>
                 </div>
-                <div class="end-call-wrap action-icon-style display-center mr-2 cursor-pointer">
+
+                <!-- End Call -->
+                <div class="action-icon-style display-center mx-2 cursor-pointer end-call-wrap">
                     <span class="material-icons text-danger">call</span>
                 </div>
-                <div class="video-toggle-wrap action-icon-style display-center cursor-pointer" id="btnStartStopCam">
+
+                <!-- Video Control -->
+                <div class="action-icon-style display-center mx-2 cursor-pointer" id="btnStartStopCam">
                     <span class="material-icons">videocam_off</span>
                 </div>
-            </div>
-            
-            <div class="bottom-right d-flex justify-content-center align-items-center mr-3" style="height:10vh;">
-                <div class="present-now-wrap d-flex justify-content-center flex-column align-items-center mr-5 cursor-pointer" id="btnStartStopScreenshare" style="height:10vh;">
-                    <div class="present-now-icon">
-                        <span class="material-icons">present_to_all</span>
-                    </div>
-                    <div>Present Now</div>
+
+                <!-- Recording Controls -->
+                <div class="display-center mx-2">
+                    <button class="btn btn-danger btn-sm" id="start-recording">Start Recording</button>
+                    <button id="download-video" class="btn btn-success btn-sm ml-1" disabled>Download Video</button>
                 </div>
-                <button style="display: none;" id="btnResetMeeting">Reset Meeting</button>
-                <div class="option-wrap cursor-pointer display-center" style="height:10vh;position:relative;">
-                    <div class="recording-wrap cursor-pointer" style="position: absolute;display:none;">
-                        <button class="recording-ation btn btn-danger btn-sm" id="start-recording">Start Recording</button>
-                        <button id="download-video" class="btn btn-success btn-sm" disabled>Download Video</button>
-                    </div>
+
+                <!-- Present Now -->
+                <div class="display-center mx-2 cursor-pointer" id="btnStartStopScreenshare">
+                    <button class="btn btn-primary btn-sm">
+                        <span class="material-icons align-middle">present_to_all</span>
+                        <span class="align-middle">Present Now</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Section - Options -->
+            <div class="bottom-right d-flex justify-content-center align-items-center mr-3" style="height:10vh;">
+                <div class="option-wrap cursor-pointer display-center" style="position:relative;">
                     <div class="option-icon">
                         <span class="material-icons">more_vert</span>
                     </div>
                 </div>
             </div>
         </div>
-        
+
+        <!-- Meeting Details Panel -->
+        <div class="g-detail" style="display: none; position: fixed; bottom: 80px; left: 20px; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000; width: 300px;">
+            <div class="g-details-heading d-flex border-bottom">
+                <div class="g-details-heading-detail cursor-pointer p-2">Details</div>
+                <div class="g-details-heading-attachment cursor-pointer p-2">Attachments</div>
+            </div>
+            <div class="g-details-heading-show p-2">
+                <div class="meeting-info">
+                    <h4>Meeting Information</h4>
+                    <p>Meeting URL: <span class="meeting_url"></span></p>
+                    <button class="copy_info btn btn-sm btn-primary">Copy</button>
+                    <span class="link-conf" style="display:none;">Copied!</span>
+                </div>
+            </div>
+            <div class="g-details-heading-show-attachment p-2" style="display:none;">
+                <h4>Attachments</h4>
+                <div class="attachments-list"></div>
+            </div>
+        </div>
+
+        <!-- Leave Meeting Confirmation -->
         <div class="top-box-show" style="display: none;"></div>
         <input type="hidden" name="" class="username_holder">
     </main>
@@ -482,12 +240,12 @@
             console.log(recordButton.textContent);
             if (recordButton.textContent === 'Start Recording') {
                 startRecording();
-                alert("Recording started");
+                alert("start");
             } else {
                 stopRecording();
                 recordButton.textContent = 'Start Recording';
                 downloadButton.disabled = false;
-                alert("Recording stopped");
+                alert("stop");
             }
         });
 
@@ -566,11 +324,12 @@
         function stopRecording() {
             mediaRecorder.stop();
         }
-        
+
         $(function() {
             $(document).on("click", ".option-icon", function() {
                 $(".recording-wrap").slideToggle(200)
             })
+            
             const urlParams = new URLSearchParams(window.location.search);
             var meeting_id = urlParams.get('meetingID');
             var base_url = window.location.origin;
@@ -638,8 +397,9 @@
                 $(".chat-show-wrap").hide(300);
             });
 
+            // Meeting Details Button
             $(document).on('click', '.meeting-details-button', function() {
-                $(".g-detail").slideToggle(300);
+                $(".g-detail").toggle(300);
             });
             
             $(document).on("click", ".g-details-heading-detail", function() {
@@ -663,7 +423,7 @@
                     $('.link-conf').hide();
                 }, 3000)
             })
-            
+
             var url = window.location.href;
             $(".meeting_url").text(url)
             
@@ -674,19 +434,11 @@
                 });
             }, 1000)
 
-            function videoWith() {
-                var videoCounter = $(".userbox").length;
-                var videoContainerWidth = $("#divUsers").width();
-                var videoWidth = (Math.floor(videoContainerWidth / videoCounter)) / 2;
-                $("video").css({
-                    "width": videoWidth + "px"
-                });
-            }
-            
+            // End Call Button
             $(document).on('click', '.end-call-wrap', function() {
                 $('.top-box-show').css({
                     "display": "block"
-                }).html('<div class="top-box align-vertical-middle profile-dialoge-show"> <h1 class="mt-2">Leave Meeting</h1> <hr> <div class="call-leave-cancel-action d-flex justify-content-center align-items-center w-100"> <a href="/sign"><button class="call-leave-action btn btn-danger mr-5">Leave</button></a> <button class="call-cancel-action btn btn-secondary">Cancel</button> </div> </div>');
+                }).html('<div class="top-box align-vertical-middle profile-dialoge-show "> <h1 class="mt-2">Leave Meeting</h1> <hr> <div class="call-leave-cancel-action d-flex justify-content-center align-items-center w-100"> <a href="/sign"><button class="call-leave-action btn btn-danger mr-5">Leave</button></a> <button class="call-cancel-action btn btn-secondary">Cancel</button> </div> </div>');
             })
             
             $(document).mouseup(function(e) {
