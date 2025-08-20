@@ -2,7 +2,7 @@
 const express = require("express");
 const fs = require("fs");
 const https = require("https");
-const { Server } = require("socket.io");
+const socketIO = require("socket.io");
 const path = require("path");
 
 const app = express();
@@ -18,7 +18,7 @@ const server = options.key && options.cert
   ? https.createServer(options, app)
   : require("http").createServer(app);
 
-const io = new Server(server, {
+const io = socketIO(server, {
   cors: { origin: "*", methods: ["GET", "POST"] }
 });
 
