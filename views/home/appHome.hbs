@@ -1,183 +1,460 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-  <meta charset="UTF-8">
-  <title>Video Conferencing</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f3f3f3;
-      margin: 0;
-      padding: 0;
-    }
-    #divUsers {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      padding: 20px;
-    }
-    .userbox {
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      padding: 10px;
-      text-align: center;
-    }
-    .user-name {
-      margin: 5px 0;
-    }
-    video, .video-box {
-      width: 300px;
-      height: 200px;
-      background: black;
-      border-radius: 8px;
-    }
-    #messages {
-      margin: 20px;
-      padding: 10px;
-      background: #fff;
-      border-radius: 8px;
-      height: 150px;
-      overflow-y: auto;
-    }
-    #msgbox {
-      width: 70%;
-      padding: 8px;
-    }
-    button {
-      padding: 8px 15px;
-      margin-left: 5px;
-    }
-  </style>
+    <meta name="viewport" content="width=device-width" />
+    <title>TeLis Video Classromm</title>
+    <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="./../../bootstrap.min.css">
+    <link rel="stylesheet" href="./../../style.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+    <script src="./../../jquery-3.4.1.min.js"></script>
+    <!-- <script src="scripts/jquery.signalR-2.2.2.min.js"></script> -->
+    <!-- <script src="https://localhost:44338/signalr/hubs"></script> -->
+    <!--    <script src="wrtchelper.js"></script>-->
+    <script src="./../../app.js"></script>
+
+    <script>
+        $(function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            var meeting_id = urlParams.get('meetingID');
+
+            var user_id = urlParams.get('uid');
+            if (!user_id) {
+                user_id = window.prompt('Enter your nick name!');
+            }
+
+            if (!user_id || !meeting_id) {
+                window.location.href = '/sign';
+                return;
+            }
+            $("#meetingContainer").show();
+            $("#meetingbox").hide();
+            $(".username_holder").val(user_id);
+            MyApp._init(user_id, meeting_id);
+        });
+    </script>
 </head>
+
 <body>
-  <h1 style="text-align:center;">My Video Conferencing App</h1>
-
-  <div id="divUsers">
-    <div id="me" class="userbox">
-      <h2 class="user-name">Me</h2>
-      <video autoplay muted playsinline id="localVideoCtr" class="video-box"></video>
+    <div id="meetingbox" style="display: none;">
+        <p>It seems you are not trying to join any meeting!
+            You may start a new meeting. Here is generated for you. <a id='meetingid' href="#"></a>
+        </p>
     </div>
 
-    <div id="remoteTemplate" class="userbox" style="display:none">
-      <h2 class="user-name"></h2>
-      <video autoplay playsinline class="video-box"></video>
-    </div>
-  </div>
+    <main class="container-fluid d-flex flex-column home-wrap">
+        <div class="g-top text-light">
+            <div class="top-remote-video-show-wrap d-flex">
+                <div id="meetingContainer" style="display: none;flex-basis: 75%;">
+                    <h1 id='meetingname'></h1>
+                    <div class="call-wrap " style="background-color: black;">
+                        <div id='divUsers' class="video-wrap" style="display:none;display: flex;flex-wrap: wrap;">
+                            <div id="me" class="userbox div-center-column">
+                                <h2 class="display-center" style="font-size: 14px;"></h2>
+                                <div class="display-center">
+                                    <video autoplay muted id="localVideoCtr" />
+                                </div>
+                            </div>
+                            <div id="otherTemplate" class="userbox div-center-column" style="display:none">
+                                <h2 class="display-center" style="font-size: 14px;"></h2>
+                                <div class="display-center">
+                                    <video autoplay muted id="remoteVideoCtr111"></video>
+                                    <audio autoplay controls style="display:none" id="remoteAudioCtr111"></audio>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="g-right-details-wrap bg-light text-secondary h-100" style="flex-basis: 25%;z-index: 1;display: none;">
+                    <div class="meeting-heading-wrap d-flex justify-content-between align-items-center pr-3 pl-3" style="height: 10vh;">
+                        <div class="meeting-heading font-weight-bold cursor-pointer"> Meeting Details</div>
+                        <div class="meeting-heading-cross display-center cursor-pointer">
+                            <span class="material-icons">
+                                clear
+                            </span>
+                        </div>
+                    </div>
+                    <div class="people-chat-wrap d-flex justify-content-between align-items-center border-bottom ml-3 mr-3 pl-3 pr-3" style="height: 10vh;font-size: 14px;">
+                        <div class="people-heading display-center cursor-pointer">
+                            <div class="people-heading-icon display-center mr-1">
+                                <span class="material-icons">
+                                    people
+                                </span>
+                            </div>
+                            <div class="people-heading-text display-center ">Participant (<span class="participant-count">1</span>)</div>
+                        </div>
+                        <div class="chat-heading d-flex justify-content-around align-items-center cursor-pointer">
+                            <div class="chat-heading-icon display-center mr-1"><span class="material-icons">
+                                    message
+                                </span></div>
+                            <div class="chat-heading-text">
+                                Chat
+                            </div>
+                        </div>
+                    </div>
+                    <div class="in-call-chat-wrap mr-3 ml-3 mt-4" style="font-size: 14px;">
+                        <div class="in-call-wrap-up" style="display: none !important;">
+                            <div class="in-call-wrap d-flex justify-content-between align-items-center mb-3">
+                                <div class="participant-img-name-wrap display-center cursor-pointer">
+                                    <div class="participant-img">
+                                        <img src="images/other.jpg" alt="" class="border border-secondary" style="height: 40px;width: 40px;border-radius: 50%;">
+                                    </div>
+                                    <div class="participant-name ml-2">You</div>
+                                </div>
+                                <div class="participant-action-wrap display-center">
+                                    <div class="participant-action-dot display-center mr-2 cursor-pointer">
+                                        <span class="material-icons">
+                                            more_vert
+                                        </span>
+                                    </div>
+                                    <div class="participant-action-pin display-center cursor-pointer">
+                                        <span class="material-icons">
+                                            push_pin
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chat-show-wrap text-secondary" style="font-size:14px;">
+                            <div class="chat-message-show" id="messages">
 
-  <div id="messages"></div>
-  <input type="text" id="msgbox" placeholder="Type message...">
-  <button onclick="sendMessage()">Send</button>
+                            </div>
+                            <div class="chat-message-sent d-flex justify-content-between align-items-center" style="margin-bottom: 35px;">
+                                <div class="chat-message-sent-input" style="width: 85%;">
+                                    <input type="text" name="" class="chat-message-sent-input-field w-100" id="msgbox" placeholder="Send a message to everyone" style="border: navajowhite;border-bottom: 1px solid teal;">
+                                </div>
+                                <div class="chat-message-sent-action display-center" id="btnsend" style="color: teal;cursor: pointer;">
+                                    <span class="material-icons">
+                                        send
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-  <script src="/socket.io/socket.io.js"></script>
-  <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const meetingID = urlParams.get('meetingID');
-    let userID = urlParams.get('uid');
-    if (!userID) userID = prompt('Enter your nickname');
+            <div class="g-top-left bg-light text-secondary w-25 d-flex align-items-center justify-content-between pl-2 pr-2">
+                <div class="top-left-participant-wrap pt-2 cursor-pointer">
+                    <div class="top-left-participant-icon"><span class="material-icons">
+                            people
+                        </span></div>
+                    <div class="top-left-participant-count"></div>
+                </div>
+                <div class="top-left-chat-wrap pt-2 cursor-pointer">
+                    <span class="material-icons">
+                        message
+                    </span>
+                </div>
+                <div class="top-left-time-wrap"></div>
+                <div class="top-left-you-wrap text-light d-none">You</div>
+            </div>
+        </div>
 
-    const socket = io({ secure: true });
-    const peers = {};
-    let localStream;
+        <div class="g-bottom bg-light m-0 d-flex justify-content-between align-items-center">
+            <!-- Left Section - Meeting Details -->
+            <div class="bottom-left d-flex align-items-center" style="height:10vh;">
+                <div class="display-center cursor-pointer meeting-details-button">
+                    <span class="material-icons mr-1">info</span>
+                    Meeting Details
+                </div>
+            </div>
 
-    // --- Get camera + mic
-    async function initLocalStream() {
-      try {
-        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        const localVideo = document.getElementById('localVideoCtr');
-        localVideo.srcObject = localStream;
-      } catch (err) {
-        console.error("Error accessing media devices:", err);
-        alert("Could not access camera/microphone. Please allow permissions.");
-      }
-    }
+            <!-- Center Section - Main Controls -->
+            <div class="d-flex justify-content-center align-items-center" style="height:10vh;">
+                <!-- Mic Control -->
+                <div class="action-icon-style display-center mx-2 cursor-pointer" id="btnMuteUnmute">
+                    <span class="material-icons">mic_off</span>
+                </div>
 
-    initLocalStream();
+                <!-- End Call -->
+                <div class="action-icon-style display-center mx-2 cursor-pointer end-call-wrap">
+                    <span class="material-icons text-danger">call</span>
+                </div>
 
-    // --- Join room
-    socket.emit("joinRoom", { userID, meetingID });
+                <!-- Video Control -->
+                <div class="action-icon-style display-center mx-2 cursor-pointer" id="btnStartStopCam">
+                    <span class="material-icons">videocam_off</span>
+                </div>
 
-    // --- Handle new user
-    socket.on("newUser", ({ userID: remoteID }) => {
-      createPeerConnection(remoteID, true);
-    });
+                <!-- Recording Controls -->
+                <div class="display-center mx-2">
+                    <button class="btn btn-danger btn-sm" id="start-recording">Start Recording</button>
+                    <button id="download-video" class="btn btn-success btn-sm ml-1" disabled>Download Video</button>
+                </div>
 
-    // --- Handle offer
-    socket.on("offer", async ({ from, offer }) => {
-      createPeerConnection(from, false, offer);
-    });
+                <!-- Present Now -->
+                <div class="display-center mx-2 cursor-pointer" id="btnStartStopScreenshare">
+                    <button class="btn btn-primary btn-sm">
+                        <span class="material-icons align-middle">present_to_all</span>
+                        <span class="align-middle">Present Now</span>
+                    </button>
+                </div>
+            </div>
 
-    // --- Handle answer
-    socket.on("answer", async ({ from, answer }) => {
-      await peers[from].setRemoteDescription(new RTCSessionDescription(answer));
-    });
+            <!-- Right Section - Options -->
+            <div class="bottom-right d-flex justify-content-center align-items-center mr-3" style="height:10vh;">
+                <div class="option-wrap cursor-pointer display-center" style="position:relative;">
+                    <div class="option-icon">
+                        <span class="material-icons">more_vert</span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    // --- Handle ICE
-    socket.on("iceCandidate", ({ from, candidate }) => {
-      if (peers[from]) {
-        peers[from].addIceCandidate(new RTCIceCandidate(candidate));
-      }
-    });
+        <!-- Meeting Details Panel -->
+        <div class="g-detail" style="display: none; position: fixed; bottom: 80px; left: 20px; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000; width: 300px;">
+            <div class="g-details-heading d-flex border-bottom">
+                <div class="g-details-heading-detail cursor-pointer p-2">Details</div>
+                <div class="g-details-heading-attachment cursor-pointer p-2">Attachments</div>
+            </div>
+            <div class="g-details-heading-show p-2">
+                <div class="meeting-info">
+                    <h4>Meeting Information</h4>
+                    <p>Meeting URL: <span class="meeting_url"></span></p>
+                    <button class="copy_info btn btn-sm btn-primary">Copy</button>
+                    <span class="link-conf" style="display:none;">Copied!</span>
+                </div>
+            </div>
+            <div class="g-details-heading-show-attachment p-2" style="display:none;">
+                <h4>Attachments</h4>
+                <div class="attachments-list"></div>
+            </div>
+        </div>
 
-    // --- Messaging
-    function sendMessage() {
-      const msg = document.getElementById("msgbox").value;
-      if (!msg) return;
-      socket.emit("sendMessage", { userID, meetingID, msg });
-      document.getElementById("messages").innerHTML += `<p><b>${userID}:</b> ${msg}</p>`;
-      document.getElementById("msgbox").value = "";
-    }
+        <!-- Leave Meeting Confirmation -->
+        <div class="top-box-show" style="display: none;"></div>
+        <input type="hidden" name="" class="username_holder">
+    </main>
 
-    socket.on("newMessage", ({ userID: from, msg }) => {
-      document.getElementById("messages").innerHTML += `<p><b>${from}:</b> ${msg}</p>`;
-    });
+    <script>
+        let mediaRecorder;
+        let recordedBlobs;
+        var recordButton = document.querySelector('#start-recording');
+        var downloadButton = document.querySelector('#download-video');
+        recordButton.addEventListener('click', () => {
+            console.log(recordButton.textContent);
+            if (recordButton.textContent === 'Start Recording') {
+                startRecording();
+                alert("start");
+            } else {
+                stopRecording();
+                recordButton.textContent = 'Start Recording';
+                downloadButton.disabled = false;
+                alert("stop");
+            }
+        });
 
-    // --- Peer connection
-    async function createPeerConnection(remoteID, isInitiator, offer = null) {
-      const pc = new RTCPeerConnection({
-        iceServers: [
-          { urls: "stun:stun.l.google.com:19302" }
-        ]
-      });
+        downloadButton.addEventListener('click', () => {
+            const blob = new Blob(recordedBlobs, {
+                type: 'video/webm'
+            });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'test.webm';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            }, 100);
+        });
 
-      peers[remoteID] = pc;
-
-      // Add local tracks
-      localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
-
-      // Remote stream
-      pc.ontrack = (event) => {
-        let remoteBox = document.getElementById("user-" + remoteID);
-        if (!remoteBox) {
-          const template = document.getElementById("remoteTemplate");
-          remoteBox = template.cloneNode(true);
-          remoteBox.style.display = "block";
-          remoteBox.id = "user-" + remoteID;
-          remoteBox.querySelector("h2").innerText = remoteID;
-          document.getElementById("divUsers").appendChild(remoteBox);
+        function handleDataAvailable(event) {
+            console.log('handleDataAvailable', event);
+            if (event.data && event.data.size > 0) {
+                recordedBlobs.push(event.data);
+            }
         }
-        remoteBox.querySelector("video").srcObject = event.streams[0];
-      };
 
-      // ICE candidates
-      pc.onicecandidate = (event) => {
-        if (event.candidate) {
-          socket.emit("iceCandidate", { to: remoteID, from: userID, candidate: event.candidate });
+        function startRecording() {
+            navigator.mediaDevices.getUserMedia({
+                video: true,
+                audio: true
+            }).then(stream => {
+                recordedBlobs = [];
+                let options = {
+                    mimeType: 'video/webm;codecs=vp9,opus'
+                };
+                if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+                    console.error(`${options.mimeType} is not supported`);
+                    options = {
+                        mimeType: 'video/webm;codecs=vp8,opus'
+                    };
+                    if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+                        console.error(`${options.mimeType} is not supported`);
+                        options = {
+                            mimeType: 'video/webm'
+                        };
+                        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+                            console.error(`${options.mimeType} is not supported`);
+                            options = {
+                                mimeType: ''
+                            };
+                        }
+                    }
+                }
+
+                try {
+                    mediaRecorder = new MediaRecorder(stream, options);
+                } catch (e) {
+                    console.error('Exception while creating MediaRecorder:', e);
+                    return;
+                }
+
+                console.log('Created MediaRecorder', mediaRecorder, 'with options', options);
+                recordButton.textContent = 'Stop Recording';
+                downloadButton.disabled = true;
+                mediaRecorder.onstop = (event) => {
+                    console.log('Recorder stopped: ', event);
+                    console.log('Recorded Blobs: ', recordedBlobs);
+                };
+                mediaRecorder.ondataavailable = handleDataAvailable;
+                mediaRecorder.start();
+                console.log('MediaRecorder started', mediaRecorder);
+            })
         }
-      };
 
-      // Offer/Answer
-      if (isInitiator) {
-        const offerDesc = await pc.createOffer();
-        await pc.setLocalDescription(offerDesc);
-        socket.emit("offer", { to: remoteID, from: userID, offer: offerDesc });
-      } else if (offer) {
-        await pc.setRemoteDescription(new RTCSessionDescription(offer));
-        const answerDesc = await pc.createAnswer();
-        await pc.setLocalDescription(answerDesc);
-        socket.emit("answer", { to: remoteID, from: userID, answer: answerDesc });
-      }
-    }
-  </script>
+        function stopRecording() {
+            mediaRecorder.stop();
+        }
+
+        $(function() {
+            $(document).on("click", ".option-icon", function() {
+                $(".recording-wrap").slideToggle(200)
+            })
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            var meeting_id = urlParams.get('meetingID');
+            var base_url = window.location.origin;
+
+            $(document).on("click", ".share-attach", function(e) {
+                e.preventDefault();
+                var att_img = $("#customFile").prop('files')[0];
+                var formData = new FormData();
+                formData.append("zipfile", att_img);
+                formData.append("meeting_id", meeting_id);
+                formData.append("username", $('.username_holder').val());
+                console.log(formData);
+
+                $.ajax({
+                    url: base_url + "/attachimg",
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        console.log(response);
+                    },
+                    error: function() {
+                        console.log('error');
+                    }
+                })
+            })
+
+            $(".custom-file-input").on("change", function() {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+            });
+
+            var time = new Date();
+            var timeDiv = document.getElementsByClassName("top-left-time-wrap");
+            timeDiv[0].innerHTML = time.toLocaleString('en-US', {
+                hour: 'numeric',
+                minute: 'numeric',
+                hour12: true
+            })
+
+            $(document).on('click', '.top-left-participant-wrap', function() {
+                $(".g-right-details-wrap").show(300);
+                $(".in-call-wrap-up").show(300);
+                $(".chat-show-wrap").hide(300);
+            });
+            
+            $(document).on('click', '.top-left-chat-wrap', function() {
+                $(".g-right-details-wrap").show(300);
+                $(".in-call-wrap-up").hide(300);
+                $(".chat-show-wrap").show(300);
+            });
+            
+            $(document).on('click', '.meeting-heading-cross', function() {
+                $(".g-right-details-wrap").hide(300);
+            });
+            
+            $(document).on('click', '.chat-heading', function() {
+                $(".in-call-wrap-up").hide(300);
+                $(".chat-show-wrap").show(300);
+            });
+            
+            $(document).on('click', '.people-heading', function() {
+                $(".in-call-wrap-up").show(300);
+                $(".chat-show-wrap").hide(300);
+            });
+
+            // Meeting Details Button
+            $(document).on('click', '.meeting-details-button', function() {
+                $(".g-detail").toggle(300);
+            });
+            
+            $(document).on("click", ".g-details-heading-detail", function() {
+                $(".g-details-heading-show").show();
+                $(".g-details-heading-show-attachment").hide();
+            })
+            
+            $(document).on("click", ".g-details-heading-attachment", function() {
+                $(".g-details-heading-show").hide();
+                $(".g-details-heading-show-attachment").show();
+            })
+            
+            $(document).on("click", ".copy_info", function() {
+                var $temp = $("<input>");
+                $("body").append($temp);
+                $temp.val($(".meeting_url").text()).select();
+                document.execCommand("copy");
+                $temp.remove();
+                $('.link-conf').show();
+                setTimeout(function() {
+                    $('.link-conf').hide();
+                }, 3000)
+            })
+
+            var url = window.location.href;
+            $(".meeting_url").text(url)
+            
+            setTimeout(function() {
+                var videoWidth = $("video").width();
+                $("video").css({
+                    "width": videoWidth + "px"
+                });
+            }, 1000)
+
+            // End Call Button
+            $(document).on('click', '.end-call-wrap', function() {
+                $('.top-box-show').css({
+                    "display": "block"
+                }).html('<div class="top-box align-vertical-middle profile-dialoge-show "> <h1 class="mt-2">Leave Meeting</h1> <hr> <div class="call-leave-cancel-action d-flex justify-content-center align-items-center w-100"> <a href="/sign"><button class="call-leave-action btn btn-danger mr-5">Leave</button></a> <button class="call-cancel-action btn btn-secondary">Cancel</button> </div> </div>');
+            })
+            
+            $(document).mouseup(function(e) {
+                var container = new Array();
+                container.push($('.top-box-show'));
+                $.each(container, function(key, value) {
+                    if (!$(value).is(e.target) && $(value).has(e.target).length === 0) {
+                        $(value).empty();
+                    }
+                })
+            })
+            
+            $(document).on('click', '.call-cancel-action', function() {
+                $('.top-box-show').html('');
+            })
+        })
+    </script>
 </body>
 </html>
