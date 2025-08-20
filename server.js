@@ -49,32 +49,45 @@ io.on("connection", (socket) => {
     if (!meetings[meetingID]) meetings[meetingID] = {};
     meetings[meetingID][socket.id] = userID;
 
-    // Send updated participant list to all in meeting
-    io.to(meetingID).emit("newParticipant", {
-      participants: Object.values(meetings[meetingID]),
-      userID,
-      socketID: socket.id
-    });
+    // Get existing participants
+    const participants = Object.values(meetings[meetingID]);
+    
+    // Send existing participants to the new user
+    socket.emit("existingParticipants", participants);
+    
+    // Notify others about the new user (except the new user themselves)
+    socket.to(meetingID).emit("userJoined", { userID });
+    
+    console.log(`User ${userID} joined meeting ${meetingID}. Participants:`, participants);
   });
 
-  // Forward WebRTC signaling
-  socket.on("signal", ({ targetID, fromID, signal }) => {
-    io.to(targetID).emit("signal", { fromID, signal });
+  // Forward WebRTC signaling (compatible with SimplePeer)
+  socket.on("signal", ({ to, from, data }) => {
+    io.to(to).emit("signal", { from, data });
   });
 
-  // Chat messages
-  socket.on("sendMessage", ({ meetingID, userID, msg }) => {
-    io.to(meetingID).emit("receiveMessage", { userID, msg });
+  // Chat messages (updated to match client)
+  socket.on("sendMessage", ({ meetingID, user, message }) => {
+    io.to(meetingID).emit("newMessage", { user, message });
   });
 
   // Disconnect
   socket.on("disconnect", () => {
     const { meetingID, userID } = socket;
+    
     if (meetingID && meetings[meetingID]) {
       delete meetings[meetingID][socket.id];
-      io.to(meetingID).emit("participantLeft", { userID, socketID: socket.id });
+      
+      // Notify others that user left
+      socket.to(meetingID).emit("userLeft", { userID });
+      
+      // Clean up empty meetings
+      if (Object.keys(meetings[meetingID]).length === 0) {
+        delete meetings[meetingID];
+      }
     }
-    console.log("User disconnected:", socket.id);
+    
+    console.log("User disconnected:", socket.id, userID);
   });
 });
 
